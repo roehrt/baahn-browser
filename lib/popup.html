@@ -1,0 +1,90 @@
+<div class="baahn-popup baahn-popup--loading">
+    <div class="baahn-popup__body">
+        <div class="baahn-popup__status">
+            Suche nach günstigsten Preisen..
+        </div>
+        <span class="baahn-popup__action"></span>
+    </div>
+    <div class="baahn-popup__bar">
+        <div class="baahn-popup__bar__value"></div>
+    </div>
+</div>
+
+<style>
+    .baahn-popup {
+        position: absolute;
+        top: 200px;
+        right: 10px;
+
+        min-width: 300px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;
+        font-family: DBSansRegular, Arial, sans-serif;
+    }
+
+    .baahn-popup__body {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 16px;
+    }
+
+    .baahn-popup__status {
+        color: #646973;
+        flex-grow: 1;
+    }
+
+    .baahn-popup__action {
+        width: 20px;
+        height: 20px;
+        margin: 0 0 0 8px;
+        cursor: pointer;
+        background: url('https://www.img-bahn.de/s3/prod/v/img_responsive/20dp_icon_navigation_expand-more.svg') no-repeat;
+    }
+
+    .baahn-popup--loading .baahn-popup__action {
+        background: url('https://www.img-bahn.de/s3/prod/v/img_responsive/ic_icon-button_close.svg') no-repeat;
+    }
+
+    .baahn-popup__bar {
+        width: 100%;
+        height: 2px;
+        overflow: hidden;
+    }
+    .baahn-popup__bar__value {
+        width: 100%;
+        height: 100%;
+        background: #63a615;
+        animation: finishAnimation .5s ease-out;
+    }
+
+    @keyframes finishAnimation {
+        from {
+            transform:  scaleX(0);
+        }
+    }
+
+    .baahn-popup--loading .baahn-popup__bar__value {
+        animation: indeterminateAnimation 1s infinite linear;
+        transform-origin: 0 50%;
+    }
+
+    @keyframes indeterminateAnimation {
+        0% {
+            transform:  translateX(0) scaleX(0);
+        }
+        40% {
+            transform:  translateX(0) scaleX(0.4);
+        }
+        100% {
+            transform:  translateX(100%) scaleX(0.5);
+        }
+    }
+
+    .baahn-price {
+        font-size: 16px;
+    }
+</style>

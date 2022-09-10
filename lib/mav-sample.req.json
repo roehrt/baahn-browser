@@ -1,0 +1,32 @@
+{
+  "offerkind": "4",
+  "startStationCode": "008062648",
+  "innerStationsCodes": [
+    {
+      "stationCode": "008011068",
+      "durationOfStay": 0
+    }
+  ],
+  "endStationCode": "005510009",
+  "passangers": [
+    {
+      "passengerId": 0,
+      "passengerCount": 1,
+      "customerTypeKey": "52_018-199",
+      "customerDiscountsKeys": []
+    }
+  ],
+  "isOneWayTicket": true,
+  "isTravelEndTime": false,
+  "isSupplementaryTicketsOnly": false,
+  "travelStartDate": "2022-09-02T23:30:00+02:00",
+  "travelReturnDate": "2022-09-03T00:00:00+02:00",
+  "selectedServices": [
+    50
+  ],
+  "selectedSearchServices": [
+    "BUDAPESTI_HELYI_KOZLEKEDESSEL"
+  ],
+  "eszkozSzamok": [],
+  "isOfDetailedSearch": true
+}

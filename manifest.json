@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "baahn",
+  "version": "1.0",
+
+  "description": "Find discounts on your DB journey",
+
+  "content_scripts": [
+    {
+      "matches": ["*://reiseauskunft.bahn.de/*"],
+      "js": ["dist/baahn-popup.js"]
+    }
+  ],
+  "permissions": [
+    "https://jegy-a.mav.hu/IK_API_PROD/api/OfferRequestApi/*",
+    "activeTab",
+    "storage",
+    "webRequest"
+  ]
+}
+

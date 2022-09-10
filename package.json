@@ -1,0 +1,33 @@
+{
+  "name": "baahn-browser",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start:firefox": "web-ext run",
+    "build": "parcel build lib/baahn-popup.ts",
+    "watch": "parcel watch lib/baahn-popup.ts",
+    "debug:firefox": "web-ext run",
+    "lint": "eslint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-inline-string": "^2.7.0",
+    "@types/firefox-webext-browser": "^94.0.1",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "eslint": "^8.22.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "parcel": "^2.7.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "typescript": "^4.7.4",
+    "web-ext": "^7.1.1"
+  },
+  "dependencies": {
+    "fast-fuzzy": "^1.11.2"
+  }
+}
