@@ -1,5 +1,5 @@
 <div class="baahn-popup baahn-popup--loading">
-    <div class="baahn-popup__body">
+    <div class="baahn-popup__header">
         <div class="baahn-popup__status">
             Suche nach günstigsten Preisen..
         </div>
@@ -7,6 +7,13 @@
     </div>
     <div class="baahn-popup__bar">
         <div class="baahn-popup__bar__value"></div>
+    </div>
+    <div class="baahn-popup__body-wrapper">
+        <div class="baahn-popup__body">
+            <h2 class="baahn-popup__result-title">Deine Optionen</h2>
+            <ul class="baahn-popup__results">
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -24,7 +31,7 @@
         font-family: DBSansRegular, Arial, sans-serif;
     }
 
-    .baahn-popup__body {
+    .baahn-popup__header {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -32,9 +39,82 @@
         padding: 16px;
     }
 
+    .baahn-popup__body-wrapper {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .baahn-popup__body, .baahn-popup--expanded .baahn-popup__body-wrapper {
+        max-height: 300px;
+    }
+
+    .baahn-popup__body {
+        padding: 16px;
+        overflow: auto;
+    }
+
     .baahn-popup__status {
-        color: #646973;
+        color: #333;
         flex-grow: 1;
+        font-family: DBSansBold, Arial, sans-serif;
+    }
+
+    .baahn-popup--loading .baahn-popup__status {
+        color: #646973;
+        font-family: DBSansRegular, Arial, sans-serif;
+    }
+
+    .baahn-popup__status__price {
+        position: relative;
+        font-family: DBSansBold, Arial, sans-serif;
+        font-size: 14px;
+        background: #36393f;
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 20px;
+    }
+
+    .baahn-popup__result-title {
+        margin: 0;
+        font-size: 16px;
+        font-family: DBSansBold, Arial, sans-serif;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .baahn-popup__result {
+        display: flex;
+        flex-direction: row;
+        font-size: 15px;
+        padding: 12px 0;
+    }
+
+    .baahn-popup__result:not(:last-child) {
+        border-bottom: 1px solid #bbb;
+    }
+
+    .baahn-popup__result__price {
+        margin-right: 5px;
+        width: 75px;
+        text-align: right;
+    }
+
+    .baahn-popup__result__text::before {
+        content: '|';
+        color: #e5e5e5;
+        margin-right: 5px;
+    }
+
+    .baahn-popup__result__link {
+        margin-left: auto;
+        /* from bahn.de */
+        cursor: pointer;
+        padding-left: 1.25rem;
+        background-repeat: no-repeat;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath class='st0' d='M-.02 15.91L11.29 4.6l2.12 2.12L2.1 18.03z' fill='%23cb0012'/%3E%3Cpath class='st0' d='M4 0v2.8h11.2V14H18V0z' fill='%23cb0012'/%3E%3C/svg%3E");
+        background-position: .125rem .4375rem;
+        background-size: .6875rem .6875rem;
     }
 
     .baahn-popup__action {
@@ -43,10 +123,19 @@
         margin: 0 0 0 8px;
         cursor: pointer;
         background: url('https://www.img-bahn.de/s3/prod/v/img_responsive/20dp_icon_navigation_expand-more.svg') no-repeat;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .baahn-popup--expanded .baahn-popup__action {
+        transform: rotate(180deg);
     }
 
     .baahn-popup--loading .baahn-popup__action {
         background: url('https://www.img-bahn.de/s3/prod/v/img_responsive/ic_icon-button_close.svg') no-repeat;
+    }
+
+    .baahn-popup--error .baahn-popup__action {
+        display: none;
     }
 
     .baahn-popup__bar {
@@ -54,6 +143,7 @@
         height: 2px;
         overflow: hidden;
     }
+
     .baahn-popup__bar__value {
         width: 100%;
         height: 100%;
@@ -61,9 +151,13 @@
         animation: finishAnimation .5s ease-out;
     }
 
+    .baahn-popup--error .baahn-popup__bar__value {
+        background: #ff0000;
+    }
+
     @keyframes finishAnimation {
         from {
-            transform:  scaleX(0);
+            transform: scaleX(0);
         }
     }
 
@@ -74,17 +168,29 @@
 
     @keyframes indeterminateAnimation {
         0% {
-            transform:  translateX(0) scaleX(0);
+            transform: translateX(0) scaleX(0);
         }
+
         40% {
-            transform:  translateX(0) scaleX(0.4);
+            transform: translateX(0) scaleX(0.4);
         }
+
         100% {
-            transform:  translateX(100%) scaleX(0.5);
+            transform: translateX(100%) scaleX(0.5);
         }
     }
 
-    .baahn-price {
-        font-size: 16px;
+    .baahn-badge {
+        cursor: pointer;
+        position: relative;
+        font-family: DBSansBold, Arial, sans-serif;
+        font-size: 14px;
+        background: linear-gradient(135deg, #8547c6 25%, #b845c1 62%, #ab5d8a 95%);
+        color: #fff;
+        padding: 4px 6px;
+        border-radius: 4px;
+    }
+    .baahn-provider {
+        text-decoration: underline;
     }
 </style>

@@ -8,7 +8,7 @@
   "content_scripts": [
     {
       "matches": ["*://reiseauskunft.bahn.de/*"],
-      "js": ["dist/baahn-popup.js"]
+      "js": ["dist/index.js"]
     }
   ],
   "permissions": [

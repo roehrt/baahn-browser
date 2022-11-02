@@ -18,7 +18,9 @@
     "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
     "no-continue": "off",
     "no-param-reassign": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "indent": ["error", 2],
+    "no-plusplus": "off"
   }
 }
 

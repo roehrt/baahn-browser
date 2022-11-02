@@ -4,10 +4,10 @@
   "description": "",
   "scripts": {
     "start:firefox": "web-ext run",
-    "build": "parcel build lib/baahn-popup.ts",
-    "watch": "parcel watch lib/baahn-popup.ts",
+    "build": "parcel build lib/index.ts",
+    "watch": "parcel watch lib/index.ts",
     "debug:firefox": "web-ext run",
-    "lint": "eslint"
+    "lint": "eslint **/*.ts --fix"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +24,7 @@
     "parcel": "^2.7.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
-    "typescript": "^4.7.4",
+    "typescript": "^4.8.4",
     "web-ext": "^7.1.1"
   },
   "dependencies": {

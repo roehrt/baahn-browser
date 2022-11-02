@@ -1,11 +1,14 @@
 import POPUP_HTML from 'bundle-text:./popup.html';
-import { search } from './query';
-import { formatPrice, parsePrice } from './utils';
+import { formatPrice } from './utils';
 
-class Popup {
+export class Popup {
   private readonly container: HTMLElement;
 
   private readonly status: HTMLElement;
+
+  private readonly button: HTMLElement;
+
+  private readonly resultList: HTMLElement;
 
   private readonly rootClass = 'baahn-popup';
 
@@ -15,6 +18,13 @@ class Popup {
     parent.innerHTML += POPUP_HTML;
     this.container = parent.querySelector(`.${this.rootClass}`) as HTMLElement;
     this.status = this.container.querySelector(`.${this.rootClass}__status`) as HTMLElement;
+    this.button = this.container.querySelector(`.${this.rootClass}__action`) as HTMLElement;
+    this.resultList = this.container.querySelector(`.${this.rootClass}__results`) as HTMLElement;
+    this.button.addEventListener('click', () => this.toggleSheet());
+  }
+
+  private toggleSheet() {
+    this.container.classList.toggle(`${this.rootClass}--expanded`);
   }
 
   private setLoading(isLoading: boolean) {
@@ -22,104 +32,51 @@ class Popup {
     this.container.classList.toggle(`${this.rootClass}--loading`, this.isLoading);
   }
 
+  public setError(error: Error) {
+    this.displayStatus('Fehler beim Abrufen der Daten');
+    this.container.classList.add(`${this.rootClass}--error`);
+    this.setLoading(false);
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+
   private displayStatus(text: string) {
     this.status.innerHTML = text;
   }
 
-  public addSaving(saving: Saving) {
-    const {
-      price,
-      provider,
-    } = saving;
-    this.displayStatus(`Ab ${formatPrice(price)} € mit ${provider}`);
+  private addResult(result: Journey) {
+    const resultItem = document.createElement('li');
+    resultItem.classList.add(`${this.rootClass}__result`);
+    resultItem.innerHTML = `
+      <span class="baahn-popup__result__price">${formatPrice(result.price)} €</span>
+      <span class="baahn-popup__result__text">${result.details.text}</span>
+      <a class="baahn-popup__result__link" href="${result.details.url}" target="_blank">${result.details.provider}</a>
+    `;
+    this.resultList.appendChild(resultItem);
+  }
+
+  private updateResults(journeys: Array<Journey>) {
+    this.resultList.innerHTML = '';
+    journeys.forEach((journey) => this.addResult(journey));
+  }
+
+  private noResults() {
+    this.displayStatus('Keine Ergebnisse');
+    this.container.classList.add(`${this.rootClass}--no-results`);
+    this.setLoading(false);
+  }
+
+  public addSaving(journeys: Array<Journey>) {
+    journeys.sort((a, b) => a.price - b.price);
+    const cheapest = journeys?.[0];
+    if (!cheapest) {
+      this.noResults();
+      return;
+    }
+
+    this.displayStatus(`Ab <span class="baahn-popup__status__price">${formatPrice(cheapest.price)} €</span>`
+      + ` mit ${cheapest.details.provider}`);
+    this.updateResults(journeys);
     this.setLoading(false);
   }
 }
-
-class BaahnManager {
-  private readonly popup: Popup;
-
-  private tickets: Array<Ticket> | null = null;
-
-  private readonly uiRoot = document.getElementById('doc') ?? document.body;
-
-  constructor() {
-    this.popup = new Popup(this.uiRoot);
-  }
-
-  private static openDetails(elem: Element) {
-    const details = elem.querySelector('a.iconLink.open') as HTMLAnchorElement;
-    details?.click();
-  }
-
-  private static closeDetails(elem: Element) {
-    const details = elem.querySelector('a.iconLink.close') as HTMLAnchorElement;
-    details?.click();
-  }
-
-  private static async hashJourney(elem: Element): Promise<string> {
-    BaahnManager.openDetails(elem);
-    console.debug('Waiting for details to load');
-    // eslint-disable-next-line no-promise-executor-return
-    await new Promise((r) => setTimeout(r, 500));
-    const hash = Array.from(elem.querySelectorAll('.sectionDeparture .time, .sectionArrival .time'))
-      .map((e: Element) => (e as HTMLElement).innerText.match(/\d{2}:\d{2}/)?.[0]);
-    BaahnManager.closeDetails(elem);
-    return hash.join('#');
-  }
-
-  private static async parseTicket(elem: Element) {
-    const priceElem = elem.querySelector('.fareOutput');
-    const price = priceElem ? parsePrice(
-      (priceElem as HTMLElement).innerText.match(/\d+,\d+/)?.[0] ?? 'Infinity',
-    ) : Infinity;
-    const hash = await BaahnManager.hashJourney(elem);
-    return {
-      elem,
-      price,
-      hash,
-    };
-  }
-
-  private async parseTickets(): Promise<Array<Ticket>> {
-    const tickets = await Promise.all(
-      Array.from(this.uiRoot.querySelectorAll('.overviewConnection'))
-        .map(BaahnManager.parseTicket),
-    );
-    return tickets.filter((t) => t !== null && t.hash !== '' && t.price < Infinity);
-  }
-
-  public async loadTickets() {
-    this.tickets = await this.parseTickets();
-    console.debug('Tickets loaded', this.tickets);
-  }
-
-  public async addSaving(saving: Saving) {
-    if (this.tickets === null) await this.loadTickets();
-    this.popup.addSaving(saving);
-    const updates: { [key: string]: { elem: Element, price: number } } = {};
-
-    saving.journeys?.forEach((journey) => {
-      const ticket = this.tickets?.find((t) => journey.hash.startsWith(t.hash) || journey.hash.endsWith(t.hash));
-      if (!ticket) return;
-      if (ticket.price > journey.price && (updates[ticket.hash]?.price ?? Infinity) > journey.price) {
-        updates[ticket.hash] = {
-          elem: ticket.elem,
-          price: journey.price,
-        };
-      }
-    });
-    for (const journey of Object.values(updates)) {
-      const fare = journey?.elem?.querySelector('.fareOutput');
-      if (journey && fare) {
-        fare.innerHTML += ` <span class="baahn-price">(${formatPrice(journey.price)} € mit ${saving.provider})</span>`;
-      }
-    }
-  }
-}
-setTimeout(async () => {
-  const manager = new BaahnManager();
-  await manager.loadTickets();
-  const saving = await search();
-  await manager.addSaving(saving);
-}, 2000);

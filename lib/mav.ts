@@ -1,6 +1,6 @@
 import { search } from 'fast-fuzzy';
 import assert from 'assert';
-import { formatTime } from './utils';
+import { debug, formatTime } from './utils';
 
 const searchApi = 'https://jegy-a.mav.hu/IK_API_PROD/api/OfferRequestApi/GetOfferRequest';
 const stationApi = 'https://jegy-a.mav.hu/IK_API_PROD/api/OfferRequestApi/GetStationList';
@@ -28,19 +28,18 @@ const defaultParams = {
   }],
   isOneWayTicket: true,
   isSupplementaryTicketsOnly: false,
-  isOfDetailedSearch: true,
+  isOfDetailedSearch: false,
   eszkozSzamok: [],
-  selectedServices: ['50'],
+  selectedServices: [50],
   selectedSearchServices: ['BUDAPESTI_HELYI_KOZLEKEDESSEL'],
 };
 
 const loadStationList = async (): Promise<Array<MAVStation>> => {
   let { stationList } = await browser.storage.local.get('stationList');
   if (!stationList) {
-    console.info('Loading station list from API');
+    debug('Loading station list from API');
     const raw = await fetch(stationApi, { method: 'POST' });
-    const res = await raw.json();
-    stationList = res;
+    stationList = await raw.json();
     browser.storage.local.set({ stationList });
   }
   return stationList;
@@ -61,6 +60,15 @@ const transformQuery = async (params: SearchParams, mode: 'append' | 'prepend'):
     if (origin !== BUDAPEST) stops.unshift(BUDAPEST);
   } else if (destination !== BUDAPEST) stops.push(BUDAPEST);
 
+  let time = params.date;
+  const BUDAPEST_BERLIN_OFFSET = 11 * 60 * 60; // 11 hours
+  if (mode === 'prepend' && params.isDeparture) {
+    time = new Date(time.getTime() - BUDAPEST_BERLIN_OFFSET);
+  }
+  if (mode === 'append' && !params.isDeparture) {
+    time = new Date(time.getTime() + BUDAPEST_BERLIN_OFFSET);
+  }
+
   return {
     ...defaultParams,
     startStationCode: stops[0],
@@ -69,8 +77,8 @@ const transformQuery = async (params: SearchParams, mode: 'append' | 'prepend'):
       durationOfStay: 0,
     }],
     endStationCode: stops[2],
-    travelStartDate: params.date.toISOString(),
-    travelReturnDate: new Date(params.date.getTime() + 30 * 60 * 1000).toISOString(), // + 30 min
+    travelStartDate: time.toISOString(),
+    travelReturnDate: new Date(time.getTime() + 30 * 60 * 1000).toISOString(), // + 30 min
     isTravelEndTime: !params.isDeparture,
   };
 };
@@ -80,38 +88,47 @@ const parsePrice = (price: any): Number => {
   return parseInt(price.amount, 10);
 };
 
-const parseJourney = (journey: any): JourneyHash => {
+const parseJourney = (journey: any, mode: 'append' | 'prepend'): Journey => {
   const prices = journey.travelClasses.map((c: any) => parsePrice(c.price))
     .filter((p: Number) => p > 0);
   const price = Math.min(...prices) ?? Infinity;
-  const hash = journey.details.routes.map(
-    (s: any) => `${formatTime(s.departure.time)}#${formatTime(s.arrival.time)}`,
-  ).join('#');
+  const hash = journey.details.routes.filter(
+    (s: any) => s.travelTime !== null,
+  )
+    .map(
+      (s: any) => `${formatTime(s.departure.time)}#${formatTime(s.arrival.time)}`,
+    )
+    .join('#');
+
+  const isDep = mode === 'append';
+  const timeInfo = `${isDep ? 'Ab' : 'An'}: ${formatTime(journey[isDep ? 'departure' : 'arrival'].time)}`;
 
   return {
     price,
     hash,
+    details: {
+      url: 'https://jegy.mav.hu',
+      text: timeInfo,
+      provider: 'MAV',
+    },
   };
 };
 
-const parseResponse = (res: any): Array<JourneyHash> => res.route.map((journey: any) => parseJourney(journey));
+const parseResponse = (res: any, mode: 'append' | 'prepend'): Array<Journey> => res.route.map(
+  (journey: any) => parseJourney(journey, mode),
+);
 
 const makeQuery = async (params: SearchParams, mode: 'append' | 'prepend') => {
   const transformed = await transformQuery(params, mode);
+  debug(JSON.stringify(transformed));
   const res = await searchReq(transformed);
-  const journeys = parseResponse(res);
-  return {
-    price: Math.min(...journeys.map((j) => j.price)),
-    journeys,
-  };
+  debug(res);
+  return parseResponse(res, mode);
 };
 
-export const findJourney = async (params: SearchParams): Promise<Saving> => {
+export const findJourney = async (params: SearchParams): Promise<Array<Journey>> => {
+  // throw new Error('Not implemented');
   const A = await makeQuery(params, 'prepend');
   const B = await makeQuery(params, 'append');
-  return {
-    price: Math.min(A.price, B.price),
-    provider: 'MAV',
-    journeys: A.journeys.concat(B.journeys),
-  };
+  return [...A, ...B];
 };

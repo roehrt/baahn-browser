@@ -26,7 +26,7 @@ type MAVSearchParams = {
   isSupplementaryTicketsOnly: boolean,
   travelStartDate: string,
   travelReturnDate: string,
-  selectedServices: Array<string>,
+  selectedServices: Array<Number>,
   selectedSearchServices: Array<string>,
   eszkozSzamok: Array<any>,
   isOfDetailedSearch: boolean,
@@ -43,14 +43,16 @@ type JourneyHash = {
   hash: string,
 };
 
-type Ticket = JourneyHash & {
-  elem: Element,
+type Journey = JourneyHash & {
+  details: {
+    url: string,
+    text: string,
+    provider: 'MAV' | 'DB',
+  }
 };
 
-type Saving = {
-  price: number,
-  provider: 'MAV' | 'DB',
-  journeys?: Array<JourneyHash>,
+type Ticket = Journey & {
+  elem: Element,
 };
 
 declare module 'bundle-text:*' {
