@@ -1,4 +1,4 @@
-import { findJourney } from './mav';
+import { findJourney } from './MAV';
 import { debug } from './utils';
 
 const parseDate = (dateString: string | null, timeString: string | null) => {

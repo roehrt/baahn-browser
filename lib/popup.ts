@@ -1,5 +1,6 @@
-import POPUP_HTML from 'bundle-text:./popup.html';
+import POPUP_HTML from 'bundle-text:/static/popup.html';
 import { formatPrice } from './utils';
+import message from './message';
 
 export class Popup {
   private readonly container: HTMLElement;
@@ -33,7 +34,7 @@ export class Popup {
   }
 
   public setError(error: Error) {
-    this.displayStatus('Fehler beim Abrufen der Daten');
+    this.displayStatus(message.popup.error);
     this.container.classList.add(`${this.rootClass}--error`);
     this.setLoading(false);
     // eslint-disable-next-line no-console
@@ -61,7 +62,7 @@ export class Popup {
   }
 
   private noResults() {
-    this.displayStatus('Keine Ergebnisse');
+    this.displayStatus(message.popup.noResults);
     this.container.classList.add(`${this.rootClass}--no-results`);
     this.setLoading(false);
   }
@@ -73,9 +74,7 @@ export class Popup {
       this.noResults();
       return;
     }
-
-    this.displayStatus(`Ab <span class="baahn-popup__status__price">${formatPrice(cheapest.price)} €</span>`
-      + ` mit ${cheapest.details.provider}`);
+    this.displayStatus(message.popup.summary(cheapest));
     this.updateResults(journeys);
     this.setLoading(false);
   }

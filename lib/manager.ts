@@ -1,7 +1,7 @@
 import {
   debug, formatPrice, parsePrice, retryQuerySelectorAll,
 } from './utils';
-import { Popup } from './baahn-popup';
+import { Popup } from './popup';
 
 export class Manager {
   private readonly popup: Popup;

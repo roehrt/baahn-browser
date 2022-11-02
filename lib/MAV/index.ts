@@ -1,6 +1,6 @@
 import { search } from 'fast-fuzzy';
 import assert from 'assert';
-import { debug, formatTime } from './utils';
+import { debug, formatTime } from '../utils';
 
 const searchApi = 'https://jegy-a.mav.hu/IK_API_PROD/api/OfferRequestApi/GetOfferRequest';
 const stationApi = 'https://jegy-a.mav.hu/IK_API_PROD/api/OfferRequestApi/GetStationList';
