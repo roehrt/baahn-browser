@@ -1,7 +1,13 @@
-:warning: Very unstable, Code is currently a mess.
+:warning: Very unstable (and probably broken) code. Not ready.
 
 :warning: Extremely slow development :sweat_smile:
 
-# Screenshot
+"Works" in Firefox 🦊. Not tested in other browsers.
 
-<img src="screenshot.png" alt="Screenshot" style="width:600px">
+# What is this?
+
+This is a browser extension that allows you to save money on bahn.de by automatically searching other providers for cheaper tickets.
+
+## Screenshot
+
+<img src="screenshot.png" alt="Screenshot" style="width:500px">
