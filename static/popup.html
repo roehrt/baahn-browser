@@ -10,9 +10,17 @@
     </div>
     <div class="baahn-popup__body-wrapper">
         <div class="baahn-popup__body">
-            <h2 class="baahn-popup__result-title">Deine Optionen</h2>
-            <ul class="baahn-popup__results">
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Preis</th>
+                        <th>Zeitpunkt</th>
+                        <th>Anbieter</th>
+                    </tr>
+                </thead>
+                <tbody class="baahn-popup__results">
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -45,7 +53,8 @@
         transition: max-height 0.3s ease-in-out;
     }
 
-    .baahn-popup__body, .baahn-popup--expanded .baahn-popup__body-wrapper {
+    .baahn-popup__body,
+    .baahn-popup--expanded .baahn-popup__body-wrapper {
         max-height: 300px;
     }
 
@@ -83,30 +92,63 @@
         text-align: center;
     }
 
-    .baahn-popup__result {
-        display: flex;
-        flex-direction: row;
+    .baahn-popup thead {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .baahn-popup tr {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-collapse: collapse;
+        grid-column-gap: 10px;
+    }
+
+    .baahn-popup th,
+    .baahn-popup td {
+        text-align: center;
+        padding: 8px;
+    }
+
+    .baahn-popup th {
+        border-radius: 8px;
+        background: #f0f3f5;
+        font-size: 14px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .baahn-popup td {
         font-size: 15px;
-        padding: 12px 0;
     }
 
-    .baahn-popup__result:not(:last-child) {
-        border-bottom: 1px solid #bbb;
+    .baahn-popup tbody tr.recommended:first-child {
+        --badge-height: 20px;
+        --recommendation-color: #63a615;
+        border: 2px solid var(--recommendation-color);
+        border-radius: 8px;
+        position: relative;
+        margin-top: var(--badge-height);
     }
 
-    .baahn-popup__result__price {
-        margin-right: 5px;
-        width: 75px;
-        text-align: right;
+    .baahn-popup tbody tr.recommended::after {
+        content: 'Empfohlen';
+        position: absolute;
+        top: calc(-1 * var(--badge-height));
+        right: 6px;
+        height: var(--badge-height);
+        line-height: var(--badge-height);
+        padding: 0 8px;
+        font-family: DBSansBold, Arial, sans-serif;
+        background: var(--recommendation-color);
+        color: #fff;
+        border-radius: 8px 8px 0 0;
     }
 
-    .baahn-popup__result__text::before {
-        content: '|';
-        color: #e5e5e5;
-        margin-right: 5px;
+    .baahn-popup__time-kind {
+        text-decoration: dotted underline;
     }
 
-    .baahn-popup__result__link {
+    .baahn-popup__result__link>a {
         margin-left: auto;
         /* from bahn.de */
         cursor: pointer;
@@ -186,10 +228,12 @@
         font-family: DBSansBold, Arial, sans-serif;
         font-size: 14px;
         background: linear-gradient(135deg, #8547c6 25%, #b845c1 62%, #ab5d8a 95%);
-        color: #fff;
-        padding: 4px 6px;
+        color: #fff !important;
+        padding: 4px 6px !important;
+        text-decoration: none!important;
         border-radius: 4px;
     }
+    
     .baahn-provider {
         text-decoration: underline;
     }

@@ -14,7 +14,7 @@ type Journey = JourneyHash & {
   details: {
     url: string,
     text: string,
-    provider: 'MAV' | 'DB',
+    provider: string,
   }
 };
 

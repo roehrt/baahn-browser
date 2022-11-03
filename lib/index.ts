@@ -1,5 +1,4 @@
 import { retryQuerySelectorAll } from './utils';
-import { search } from './query';
 import { Manager } from './manager';
 
 async function init() {
@@ -10,8 +9,7 @@ async function init() {
   const manager = new Manager();
   await manager.loadTickets();
   try {
-    const saving = await search();
-    await manager.addSaving(saving);
+    await manager.search();
   } catch (e) {
     manager.setError(e as Error);
   }

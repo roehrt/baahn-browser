@@ -2,16 +2,24 @@ import {
   debug, formatPrice, parsePrice, retryQuerySelectorAll,
 } from './utils';
 import { Popup } from './popup';
+import { search } from './query';
 
 export class Manager {
   private readonly popup: Popup;
+
+  private abortController: AbortController;
 
   private tickets: Array<Ticket> | null = null;
 
   private readonly uiRoot = document.getElementById('doc') ?? document.body;
 
   constructor() {
-    this.popup = new Popup(this.uiRoot);
+    this.abortController = new AbortController();
+    this.abortController.signal.addEventListener('abort', () => {
+      debug('Abort signal received');
+      this.destroy();
+    });
+    this.popup = new Popup(this.uiRoot, this.abortController);
   }
 
   private static openDetails(elem: Element) {
@@ -86,9 +94,26 @@ export class Manager {
     for (const journey of Object.values(updates)) {
       const fare = journey?.elem?.querySelector('.fareOutput');
       if (journey && fare) {
-        fare.innerHTML += ' <span class="baahn-badge">'
+        fare.innerHTML += ` <a class="baahn-badge" href="${journey.details.url}" target="_blank">`
           + `${formatPrice(journey.price)} € mit <span class="baahn-provider">${journey.details.provider}</span>`
-          + '</span>';
+          + '</a>';
+      }
+    }
+  }
+
+  public destroy() {
+    this.popup.destroy();
+  }
+
+  public async search() {
+    try {
+      const journeys = await search(this.abortController.signal);
+      await this.addSaving(journeys);
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        debug('Search aborted');
+      } else {
+        this.setError(e);
       }
     }
   }

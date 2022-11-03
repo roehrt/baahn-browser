@@ -11,18 +11,34 @@ export class Popup {
 
   private readonly resultList: HTMLElement;
 
+  private readonly abortController: AbortController;
+
   private readonly rootClass = 'baahn-popup';
 
   private isLoading = true;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, abortController: AbortController) {
     parent.innerHTML += POPUP_HTML;
     this.container = parent.querySelector(`.${this.rootClass}`) as HTMLElement;
     this.status = this.container.querySelector(`.${this.rootClass}__status`) as HTMLElement;
     this.button = this.container.querySelector(`.${this.rootClass}__action`) as HTMLElement;
     this.resultList = this.container.querySelector(`.${this.rootClass}__results`) as HTMLElement;
-    this.button.addEventListener('click', () => this.toggleSheet());
+    this.button.addEventListener('click', () => this.handleClick());
+    this.abortController = abortController;
   }
+
+  public destroy() {
+    this.container.remove();
+  }
+
+  private handleClick() {
+    if (this.isLoading) {
+      this.abortController.abort();
+    } else {
+      this.toggleSheet();
+    }
+  }
+
 
   private toggleSheet() {
     this.container.classList.toggle(`${this.rootClass}--expanded`);
@@ -46,18 +62,18 @@ export class Popup {
   }
 
   private addResult(result: Journey) {
-    const resultItem = document.createElement('li');
+    const resultItem = document.createElement('tr');
     resultItem.classList.add(`${this.rootClass}__result`);
     resultItem.innerHTML = `
-      <span class="baahn-popup__result__price">${formatPrice(result.price)} €</span>
-      <span class="baahn-popup__result__text">${result.details.text}</span>
-      <a class="baahn-popup__result__link" href="${result.details.url}" target="_blank">${result.details.provider}</a>
+      <td class="baahn-popup__result__price">${formatPrice(result.price)} €</span>
+      <td class="baahn-popup__result__text">${result.details.text}</span>
+      <td class="baahn-popup__result__link"><a href="${result.details.url}" target="_blank">${result.details.provider}</a></td>
     `;
     this.resultList.appendChild(resultItem);
   }
 
   private updateResults(journeys: Array<Journey>) {
-    this.resultList.innerHTML = '';
+    // this.resultList.innerHTML = '';
     journeys.forEach((journey) => this.addResult(journey));
   }
 

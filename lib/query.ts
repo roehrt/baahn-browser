@@ -1,4 +1,4 @@
-import { findJourney } from './MAV';
+import { MAVSearch } from './MAV';
 import { debug } from './utils';
 
 const parseDate = (dateString: string | null, timeString: string | null) => {
@@ -36,10 +36,12 @@ const parseQuery = async () => {
   return searchParams;
 };
 
-export const search = async () => {
+export const search = async (abortSignal: AbortSignal) => {
+  // return [{"price":65,"hash":"22:29#05:02#05:56#07:04#07:23#14:19","details":{"url":"https://jegy.mav.hu","text":"Ab: 22:29","provider":"MAV"}},{"price":56,"hash":"04:30#09:17#09:45#11:59#12:08#14:30#14:37#17:19","details":{"url":"https://jegy.mav.hu","text":"Ab: 04:30","provider":"MAV"}}];
   const searchParams = await parseQuery();
   debug('Searching for', searchParams);
-  const saving = await findJourney(searchParams);
+  const mav = new MAVSearch(searchParams, abortSignal);
+  const saving = await mav.search();
   debug(JSON.stringify(saving));
   return saving;
 };
