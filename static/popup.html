@@ -210,15 +210,18 @@
 
     @keyframes indeterminateAnimation {
         0% {
-            transform: translateX(0) scaleX(0);
+            scale: 0 1;
+            translate: 0 0;
         }
 
         40% {
-            transform: translateX(0) scaleX(0.4);
+            scale: 0.4 1;
+            translate: 0 0;
         }
 
         100% {
-            transform: translateX(100%) scaleX(0.5);
+            scale: 0.5 1;
+            translate: 100% 0;
         }
     }
 
@@ -233,7 +236,7 @@
         text-decoration: none!important;
         border-radius: 4px;
     }
-    
+
     .baahn-provider {
         text-decoration: underline;
     }
