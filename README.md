@@ -1,4 +1,4 @@
-:warning: Very unstable (and probably broken) code. Not ready.
+:warning: Very unstable (and probably broken) code. Not ready. Not usable (yet). So don't.
 
 "Works" in Firefox 🦊. Not tested in other browsers.
 
